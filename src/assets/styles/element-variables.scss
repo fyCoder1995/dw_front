@@ -1,0 +1,133 @@
+@import "~element-ui/lib/theme-chalk/index.css";
+
+//菜单按钮
+.el-button--menu {
+  height: 48px;
+  line-height: 48px;
+  min-width: 14%;
+  border-radius: 0px;
+  padding: 0;
+  color: #5d7dff;
+  font-size: 1.6rem;
+  border: 1px solid #5d7dff;
+  transform-origin: 0 0;
+  transform: skew(30deg);
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  span {
+    display: inline-block;
+    transform-origin: 0 0;
+    transform: skew(-30deg);
+    position: relative;
+    width: 100%;
+    left: 15px;
+  }
+
+  &:first-child {
+    transform: skew(0deg);
+    position: relative;
+    border: none;
+    border-left: 1px solid #5d7dff;
+    margin-right: -15px !important;
+    & > * {
+      transform: skew(0deg);
+      left: -10px;
+    }
+    &::before {
+      position: absolute;
+      transform: skewX(30deg) !important;
+      transform-origin: 0 100%;
+      width: 100%;
+      height: 100%;
+      content: "";
+      border: 1px solid #5d7dff;
+    }
+  }
+}
+
+.el-button--menu:hover,
+.el-button--menu:focus,
+.el-button--menu:active,
+.el-button--menu:visited {
+  color: #ffffff;
+  background-color: #3e55ea;
+}
+
+.topMenuAct {
+  color: #ffffff;
+  border: 1px solid #fff;
+  background-color: #3e55ea;
+}
+
+.el-message__icon {
+  font-size: 1.4rem;
+}
+
+.loginOutClass {
+  min-width: 9%;
+  transform: skew(0deg);
+  position: relative;
+  border: none;
+  border-right: 1px solid #5d7dff;
+  margin-left: -15px !important;
+  span {
+    transform: skew(0deg) !important;
+    left: 15px !important;
+  }
+  &::before {
+    position: absolute;
+    transform: skewX(30deg) !important;
+    transform-origin: 0 100%;
+    width: 100%;
+    height: 100%;
+    content: "";
+    border: 1px solid #5d7dff;
+    left: 30px;
+  }
+}
+
+.el-button--menu:first-child:hover,
+.el-button--menu:first-child:focus,
+.el-button--menu:first-child:active,
+.el-button--menu:first-child:visited {
+  border-left: 1px solid #fff;
+  background-color: transparent;
+  &::before {
+    position: absolute;
+    transform: skewX(30deg) !important;
+    transform-origin: 0 100%;
+    width: 100%;
+    height: 100%;
+    content: "";
+    border: 1px solid #fff;
+    background-color: #3e55ea;
+  }
+}
+
+.loginOutClass:hover,
+.loginOutClass:focus,
+.loginOutClass:active,
+.loginOutClass:visited {
+  border-right: 1px solid #fff;
+  background-color: transparent;
+  &::before {
+    position: absolute;
+    transform: skewX(30deg) !important;
+    transform-origin: 0 100%;
+    width: 100%;
+    height: 100%;
+    content: "";
+    border: 1px solid #fff;
+    background-color: #3e55ea;
+  }
+}
+.el-button--menu:first-child.topMenuAct {
+  background-color: transparent;
+  border: none;
+  border-left: 1px solid #fff;
+  &::before{
+    border: 1px solid #fff;
+    background-color: #3e55ea;
+  }
+}
