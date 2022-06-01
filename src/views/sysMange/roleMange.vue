@@ -35,12 +35,22 @@
 				></el-table-column>
 				<el-table-column
 					label="操作"
-					width="160px"
+					width="200px"
 					header-align="center"
 					align="center"
 				>
 					<template slot-scope="scope" class="buttonListBox">
 						<div class="buttonListBox">
+							<el-button
+								type="text"
+								@click.native.prevent="
+									dialogSettingPowerFormVisible = true;
+									editForm = Object.assign({}, scope.row);
+									roleBackMenuIdsData(scope.row.roleName);
+								"
+								>配置权限</el-button
+							>
+							<span class="lineClass">|</span>
 							<el-button
 								type="text"
 								@click.native.prevent="
@@ -101,6 +111,26 @@
 				<el-button type="primary" @click="handleEdit">确 定</el-button>
 			</div>
 		</el-dialog>
+		<el-dialog
+			title="配置权限"
+			:visible.sync="dialogSettingPowerFormVisible"
+			:close-on-click-modal="false"
+		>
+			<el-tree
+				icon-class="el-icon-arrow-right"
+				:data="treeList"
+				node-key="id"
+				:props="defaultProps"
+				:default-checked-keys="curTreeList"
+				show-checkbox
+				@check="handleCheck"
+			>
+			</el-tree>
+			<div slot="footer">
+				<el-button @click="handleClosed">取 消</el-button>
+				<el-button type="primary" @click="handleSettingPower">确 定</el-button>
+			</div>
+		</el-dialog>
 		<Pagination
 			v-show="total > 0"
 			:total="total"
@@ -112,7 +142,7 @@
 </template>
 
 <script>
-import { roleList, addRole, updateRole,deleteRoles } from '@/api/sysMange'
+import { roleList, addRole, updateRole, deleteRoles, menuList, roleBackMenuIds } from '@/api/sysMange'
 import Pagination from '@/components/Pagination'
 export default {
 	components: { Pagination },
@@ -122,6 +152,7 @@ export default {
 			dialogAddFormVisible: false,
 			tabelData: [],
 			dialogEditFormVisible: false,
+			dialogSettingPowerFormVisible: false,
 			total: 0,
 			listQuery: {
 				pageNo: 1,
@@ -132,12 +163,27 @@ export default {
 				roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
 			},
 			editForm: {},
+			treeList: [],
+			defaultProps: {
+				children: "childrenList",
+				label: "title",
+			},
+			curTreeList: []
 		};
 	},
 	created() {
 		this.getroleListData(this.listQuery)
 	},
 	methods: {
+		async menuListData() {
+			const { result } = await menuList({})
+			this.treeList = result
+		},
+		async roleBackMenuIdsData(roleName) {
+			const { result } = await roleBackMenuIds({ roleName })
+			this.menuListData()
+			this.curTreeList = result
+		},
 		async getroleListData(params) {
 			params = arguments[0] ? arguments[0] : {}
 			const { result } = await roleList(params)
@@ -177,6 +223,7 @@ export default {
 				this.$refs.editFormRef.resetFields();
 			}
 			this.editForm = {}
+			this.dialogSettingPowerFormVisible = false
 		},
 		handleAdd() {
 			this.$refs.addFormRef.validate(async valid => {
@@ -199,6 +246,17 @@ export default {
 					this.handleClosed()
 				}
 			})
+		},
+		handleCheck(checkedNodes, checkedKeys) {
+			this.editForm.selectIdList = checkedKeys.checkedKeys
+		},
+		async handleSettingPower() {
+			await updateRole(this.editForm)
+			this.dialogSettingPowerFormVisible = false
+			this.$message.success('权限配置成功')
+			// this.handleReset()
+			// this.handleClosed()
+			location.reload()
 		}
 	},
 };

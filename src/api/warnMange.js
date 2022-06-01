@@ -53,11 +53,69 @@ export function getMonitorPage(params) {
   })
 }
 
+
+
 // 告警图片
 export function selectStUploadFileList(data) {
   return request({
     url: '/device/selectStUploadFileList',
     method: 'post',
     data
+  })
+}
+
+// 环境告警（普通）white
+export function getEnAlarmOrdinary(params) {
+  return request({
+    url: '/environment/getEnAlarmOrdinary',
+    method: 'get',
+    params
+  })
+}
+
+// 环境告警（一般）yellow
+export function getEnAlarmCommonly(params) {
+  return request({
+    url: '/environment/getEnAlarmCommonly',
+    method: 'get',
+    params
+  })
+}
+
+// 环境告警（严重）red
+export function getEnAlarmSerious(params) {
+  return request({
+    url: '/environment/getEnAlarmSerious',
+    method: 'get',
+    params
+  })
+}
+
+// 生命体征告警（普通）
+export function getBraceletAlarmOrdinary(params) {
+  return request({
+    url: '/services/getBraceletAlarmOrdinary',
+    method: 'get',
+    params
+  })
+}
+
+// 生命体征告警（一般）
+export function getBraceletAlarmCommonly(params) {
+  return request({
+    url: '/services/getBraceletAlarmCommonly',
+    method: 'get',
+    params
+  })
+}
+
+
+
+// 生命体征告警（严重）
+export function getBraceletAlarmSerious(params) {
+  return request({
+    url: '/services/getBraceletAlarmSerious',
+    method: 'get',
+    params
   })
 }

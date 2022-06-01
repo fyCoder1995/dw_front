@@ -1,5 +1,5 @@
 import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, setUserId, removeSessionStorage } from '@/utlis/auth'
+import { getToken, setToken, setUserId, setUserName, removeSessionStorage } from '@/utlis/auth'
 import { resetRouter } from '@/router'
 
 const state = {
@@ -34,10 +34,13 @@ const actions = {
   getInfo({ commit }, username) {
     return new Promise((resolve, reject) => {
       getInfo({ username }).then(response => {
-        const { result } = response
-        commit('SET_USERINFO', result)
-        setUserId(result.userId)
-        resolve(result)
+        if (response.statusCode === '200') {
+          const { result } = response
+          commit('SET_USERINFO', result)
+          setUserId(result.userId)
+          setUserName(result.loginNumber)
+          resolve(result)
+        }
       }).catch(error => {
         reject(error)
       })

@@ -97,6 +97,24 @@ export function deleteRoles(params) {
 
 // 菜单
 
+// 菜单树
+export function menuList(data) {
+  return request({
+    url: '/menu/menuList',
+    method: 'post',
+    data
+  })
+}
+
+// 角色对应菜单
+export function roleBackMenuIds(params) {
+  return request({
+    url: '/role/roleBackMenuIds',
+    method: 'get',
+    params
+  })
+}
+
 // 单位列表
 export function getOrganizationListPage(data) {
   return request({

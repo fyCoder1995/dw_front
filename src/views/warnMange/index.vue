@@ -8,7 +8,9 @@
 				popper-class="projectPopClass"
 				@change="
 					connectionSocket();
-					getMonitorPageData();
+					getEnAlarmOrdinaryData();
+					getEnAlarmCommonlyData();
+					getEnAlarmSeriousData();
 					getCrossPageData();
 				"
 				v-el-select-loadmore="loadmore"
@@ -169,227 +171,213 @@
 
 			<div class="bottomBox">
 				<p class="titleBox">
-					<span class="titleClass">电子围栏违规报警</span>
+					<span class="titleClass">环境告警记录</span>
 					<span class="numberClass"
-						><span class="red">{{ monTotal }}</span
+						>&nbsp;严重&nbsp;<span class="red" v-show="envRedTotal > 0">{{
+							envRedTotal
+						}}</span
+						>条</span
+					>
+					<span class="numberClass" v-show="envYellowTotal > 0"
+						>&nbsp;一般&nbsp;<span class="red">{{ envYellowTotal }}</span
+						>条</span
+					>
+					<span class="numberClass" v-show="envWhiteTotal > 0"
+						>&nbsp;普通&nbsp;<span class="red">{{ envWhiteTotal }}</span
 						>条</span
 					>
 				</p>
-				<div class="listBox monListBox">
+				<div class="listBox envRedListBox" v-show="envRedList.length > 0">
 					<ul>
-						<li v-for="(item, index) in monList" :key="index">
-							{{ item.alarmTime }} {{ item.ilay }} {{ item.ilowBat }}
+						<li v-for="(item, index) in envRedList" :key="index">
+							<img src="@/assets/images/warnMange/red.png" alt="bell" />
+							<span>{{ item.warningTime }} {{ item.warningInfo }}</span>
+						</li>
+					</ul>
+				</div>
+				<div class="listBox envYellowListBox" v-show="envYellowList.length > 0">
+					<ul>
+						<li v-for="(item, index) in envYellowList" :key="index">
+							<img src="@/assets/images/warnMange/yellow.png" alt="bell" />
+							{{ item.warningTime }} {{ item.warningInfo }}
+						</li>
+					</ul>
+				</div>
+				<div class="listBox envWhiteListBox" v-show="envWhiteList.length > 0">
+					<ul>
+						<li v-for="(item, index) in envWhiteList" :key="index">
+							<img src="@/assets/images/warnMange/white.png" alt="bell" />
+							{{ item.warningTime }} {{ item.warningInfo }}
 						</li>
 					</ul>
 				</div>
 			</div>
 		</div>
-		<div class="right-box">
+		<div class="main-box">
 			<div class="top-box">
-				<div class="top-left-box">
-					<p class="place-box">
-						<span
-							class="jumpBtnClass"
-							@click="
-								$router.push({
-									path: '/views/prodPlan',
-									query: { projectId: projectId },
-								})
-							"
-							>当前项目生产计划管控</span
+				<p class="place-box">
+					<span
+						class="jumpBtnClass"
+						@click="
+							$router.push({
+								path: '/views/prodPlan',
+								query: { projectId: projectId },
+							})
+						"
+						>当前项目生产计划管控</span
+					>
+					<img src="@/assets/images/placeIcon.png" alt="placeIcon" />
+					<span>{{ weatherObj.province }} {{ weatherObj.city }}</span>
+					<span>项目编号：{{ projectId }}</span>
+				</p>
+				<div class="weather-box">
+					<h3 class="titleClass">作业现场天气</h3>
+					<p class="todayWeather">
+						<span class="weatherWord"
+							>{{ weatherObj.today.daytemp }}℃
+							{{ weatherObj.today.dayweather }}</span
 						>
-						<img src="@/assets/images/placeIcon.png" alt="placeIcon" />
-						<span>{{ weatherObj.province }} {{ weatherObj.city }}</span>
+						<span class="weatcherWarn">
+							<span>恶劣天气预警</span>
+							<span>无</span>
+						</span>
 					</p>
-					<div class="weather-box">
-						<h3 class="titleClass">作业现场天气</h3>
-						<p class="todayWeather">
-							<span class="weatherWord"
-								>{{ weatherObj.today.daytemp }}℃
-								{{ weatherObj.today.dayweather }}</span
-							>
-							<span class="weatcherWarn">
-								<span>恶劣天气预警</span>
-								<span>无</span>
-							</span>
-						</p>
-						<p class="weatherWordSmall">
-							{{ weatherObj.today.daytemp }}/{{ weatherObj.today.nighttemp }}℃
-						</p>
-						<!-- <h3>未来24小时天气</h3> -->
-						<h3>未来8天天气</h3>
-						<div class="weatherList">
-							<ul>
-								<li v-for="(item, index) in weatherObj.list" :key="index">
-									<span>{{ item.time }}</span>
-									<img
-										:src="
-											require('@/assets/images/weather/' + item.icon + '.png')
-										"
-										:alt="item.icon"
-									/>
-								</li>
-							</ul>
-						</div>
-					</div>
-					<div class="setting-box">
-						<h3>警戒值设置</h3>
-						<div class="listBox">
-							<p>
-								<span>温度</span><span>{{ warnValueObj.temperature }}℃</span
-								><span
-									@click="
-										handleEdit('温度', 'temperature', warnValueObj.temperature)
+					<p class="weatherWordSmall">
+						{{ weatherObj.today.daytemp }}/{{ weatherObj.today.nighttemp }}℃
+					</p>
+					<!-- <h3>未来24小时天气</h3> -->
+					<h3>未来8天天气</h3>
+					<div class="weatherList">
+						<ul>
+							<li v-for="(item, index) in weatherObj.list" :key="index">
+								<span>{{ item.time }}</span>
+								<img
+									:src="
+										require('@/assets/images/weather/' + item.icon + '.png')
 									"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>含氧量</span><span>{{ warnValueObj.oxygenContent }}</span
-								><span
-									@click="
-										handleEdit(
-											'含氧量',
-											'oxygenContent',
-											warnValueObj.oxygenContent
-										)
-									"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>一氧化碳</span
-								><span>{{ warnValueObj.carbonMonoxide }}</span
-								><span
-									@click="
-										handleEdit(
-											'一氧化碳',
-											'carbonMonoxide',
-											warnValueObj.carbonMonoxide
-										)
-									"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>硫化氢</span
-								><span>{{ warnValueObj.hydrogenSulfide }}</span
-								><span
-									@click="
-										handleEdit(
-											'硫化氢',
-											'hydrogenSulfide',
-											warnValueObj.hydrogenSulfide
-										)
-									"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>湿度</span><span>{{ warnValueObj.humidity }}%</span
-								><span
-									@click="handleEdit('湿度', 'humidity', warnValueObj.humidity)"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>PM2.5</span><span>{{ warnValueObj.pm2d5 }}</span
-								><span @click="handleEdit('PM2.5', 'pm2d5', warnValueObj.pm2d5)"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>PM10</span><span>{{ warnValueObj.pm10 }}</span
-								><span @click="handleEdit('PM10', 'pm10', warnValueObj.pm10)"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>六氟化硫</span
-								><span>{{ warnValueObj.sulfurHexafluoride }}</span
-								><span
-									@click="
-										handleEdit(
-											'六氟化硫',
-											'sulfurHexafluoride',
-											warnValueObj.sulfurHexafluoride
-										)
-									"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>风力</span><span>{{ warnValueObj.windPower }}级</span
-								><span
-									@click="
-										handleEdit('风力', 'windPower', warnValueObj.windPower)
-									"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>二氧化硫</span
-								><span>{{ warnValueObj.sulfurDioxide }}</span
-								><span
-									@click="
-										handleEdit(
-											'二氧化硫',
-											'sulfurDioxide',
-											warnValueObj.sulfurDioxide
-										)
-									"
-									>修改</span
-								>
-							</p>
-							<p>
-								<span>二氧化氮</span
-								><span>{{ warnValueObj.carbonMonoxide }}</span
-								><span
-									@click="
-										handleEdit(
-											'二氧化氮',
-											'carbonMonoxide',
-											warnValueObj.carbonMonoxide
-										)
-									"
-									>修改</span
-								>
-							</p>
-						</div>
+									:alt="item.icon"
+								/>
+							</li>
+						</ul>
 					</div>
 				</div>
-				<div class="top-right-box">
-					<div class="itemClass">
-						<p class="titleBox">
-							<span class="titleClass">电子围栏越界监测</span>
-							<span class="numberClass"
-								><span class="red">{{ crossTotal }}</span
-								>条</span
+				<div class="setting-box">
+					<h3>警戒值设置</h3>
+					<div class="listBox">
+						<p>
+							<span>温度</span><span>{{ warnValueObj.temperature }}℃</span
+							><span
+								@click="
+									handleEdit('温度', 'temperature', warnValueObj.temperature)
+								"
+								>修改</span
 							>
 						</p>
-						<div class="listBox crossListBox">
-							<ul>
-								<li v-for="(item, index) in crossList" :key="index">
-									{{ item.alarmTime }} {{ item.ialm }} {{ item.imove }}
-								</li>
-							</ul>
-						</div>
-					</div>
-					<div class="itemClass">
-						<p class="titleBox">
-							<span class="titleClass">作业人员生命体征告警</span>
-							<span class="numberClass"
-								><span class="red">{{ signTotal }}</span
-								>条</span
+						<p>
+							<span>含氧量</span><span>{{ warnValueObj.oxygenContent }}%</span
+							><span
+								@click="
+									handleEdit(
+										'含氧量',
+										'oxygenContent',
+										warnValueObj.oxygenContent
+									)
+								"
+								>修改</span
 							>
 						</p>
-						<div class="listBox signListBox">
-							<ul>
-								<li v-for="(item, index) in signsList" :key="index">
-									{{ item.btutcTime }} {{ item.type }}人员：{{ item.userName }}
-								</li>
-							</ul>
-						</div>
+						<p>
+							<span>一氧化碳</span><span>{{ warnValueObj.carbonMonoxide }}</span
+							><span
+								@click="
+									handleEdit(
+										'一氧化碳',
+										'carbonMonoxide',
+										warnValueObj.carbonMonoxide
+									)
+								"
+								>修改</span
+							>
+						</p>
+						<p>
+							<span>硫化氢</span><span>{{ warnValueObj.hydrogenSulfide }}</span
+							><span
+								@click="
+									handleEdit(
+										'硫化氢',
+										'hydrogenSulfide',
+										warnValueObj.hydrogenSulfide
+									)
+								"
+								>修改</span
+							>
+						</p>
+						<p>
+							<span>湿度</span><span>{{ warnValueObj.humidity }}%</span
+							><span
+								@click="handleEdit('湿度', 'humidity', warnValueObj.humidity)"
+								>修改</span
+							>
+						</p>
+						<p>
+							<span>PM2.5</span><span>{{ warnValueObj.pm2d5 }}</span
+							><span @click="handleEdit('PM2.5', 'pm2d5', warnValueObj.pm2d5)"
+								>修改</span
+							>
+						</p>
+						<p>
+							<span>PM10</span><span>{{ warnValueObj.pm10 }}</span
+							><span @click="handleEdit('PM10', 'pm10', warnValueObj.pm10)"
+								>修改</span
+							>
+						</p>
+						<p>
+							<span>六氟化硫</span
+							><span>{{ warnValueObj.sulfurHexafluoride }}</span
+							><span
+								@click="
+									handleEdit(
+										'六氟化硫',
+										'sulfurHexafluoride',
+										warnValueObj.sulfurHexafluoride
+									)
+								"
+								>修改</span
+							>
+						</p>
+						<p>
+							<span>风力</span><span>{{ warnValueObj.windPower }}级</span
+							><span
+								@click="handleEdit('风力', 'windPower', warnValueObj.windPower)"
+								>修改</span
+							>
+						</p>
+						<p>
+							<span>二氧化硫</span><span>{{ warnValueObj.sulfurDioxide }}</span
+							><span
+								@click="
+									handleEdit(
+										'二氧化硫',
+										'sulfurDioxide',
+										warnValueObj.sulfurDioxide
+									)
+								"
+								>修改</span
+							>
+						</p>
+						<p>
+							<span>二氧化氮</span><span>{{ warnValueObj.carbonMonoxide }}</span
+							><span
+								@click="
+									handleEdit(
+										'二氧化氮',
+										'carbonMonoxide',
+										warnValueObj.carbonMonoxide
+									)
+								"
+								>修改</span
+							>
+						</p>
 					</div>
 				</div>
 			</div>
@@ -405,10 +393,84 @@
 					<div class="listBox">
 						<ul>
 							<li v-for="item in warnImgList" :key="item.id">
+								<!-- <img :src="require(item.fileUrl)" :alt="item.id" /> -->
 								<img :src="item.fileUrl" :alt="item.id" />
 							</li>
 						</ul>
 					</div>
+				</div>
+			</div>
+		</div>
+		<div class="right-box">
+			<div class="itemClass">
+				<p class="titleBox">
+					<span class="titleClass">电子围栏告警</span>
+					<span class="numberClass"
+						><span class="red">{{ crossTotal }}</span
+						>条</span
+					>
+				</p>
+				<div class="listBox crossListBox">
+					<ul>
+						<li v-for="(item, index) in crossList" :key="index">
+							<img src="@/assets/images/warnMange/white.png" alt="white" />
+							{{ item.alarmTime }} {{ item.ialm }} {{ item.imove }}
+							{{ item.ilowBat }} {{ item.ilay }} {{ item.userName }}
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="itemClass">
+				<p class="titleBox">
+					<span class="titleClass">作业人员生命体征告警</span>
+					<span class="numberClass" v-show="signRedTotal > 0"
+						>&nbsp;严重&nbsp;<span class="red">{{ signRedTotal }}</span
+						>条</span
+					>
+					<span class="numberClass" v-show="signYellowTotal > 0"
+						>&nbsp;一般&nbsp;<span class="red">{{ signYellowTotal }}</span
+						>条</span
+					>
+					<span class="numberClass" v-show="signWhiteTotal > 0"
+						>&nbsp;普通&nbsp;<span class="red">{{ signWhiteTotal }}</span
+						>条</span
+					>
+				</p>
+				<div class="listBox signRedListBox" signsRedList>
+					<ul>
+						<li v-for="(item, index) in signsRedList" :key="index">
+							<img src="@/assets/images/warnMange/red.png" alt="red" />
+							{{ item.warningTime }} {{ item.warningInfo }} 人员：{{
+								item.userName
+							}}
+						</li>
+					</ul>
+				</div>
+				<div
+					class="listBox signYellowListBox"
+					v-show="signsYellowList.length > 0"
+				>
+					<ul>
+						<li v-for="(item, index) in signsYellowList" :key="index">
+							<img src="@/assets/images/warnMange/yellow.png" alt="yellow" />
+							{{ item.warningTime }} {{ item.warningInfo }}人员：{{
+								item.userName
+							}}
+						</li>
+					</ul>
+				</div>
+				<div
+					class="listBox signWhiteListBox"
+					v-show="signsWhiteList.length > 0"
+				>
+					<ul>
+						<li v-for="(item, index) in signsWhiteList" :key="index">
+							<img src="@/assets/images/warnMange/white.png" alt="white" />
+							{{ item.warningTime }} {{ item.warningInfo }}人员：{{
+								item.userName
+							}}
+						</li>
+					</ul>
 				</div>
 			</div>
 		</div>
@@ -423,9 +485,8 @@
 </template>
 
 <script>
-import { getApexrest } from "@/api/public";
 import { signsDict } from "@/utlis/const";
-import { getvalue, getEnData, getProjectEnviron, getMonitorPage, getCrossPage, selectStUploadFileList } from "@/api/warnMange";
+import { getvalue, getEnData, getProjectEnviron, getCrossPage, selectStUploadFileList, getEnAlarmOrdinary, getEnAlarmCommonly, getEnAlarmSerious, getBraceletAlarmOrdinary, getBraceletAlarmCommonly, getBraceletAlarmSerious } from "@/api/warnMange";
 import { warnImgList } from "./data";
 import PopEdit from "./components/popEdit.vue";
 import axios from "axios";
@@ -450,12 +511,12 @@ export default {
 	},
 	data() {
 		return {
-			monList: [],
+
 			showEdit: false,
 			editData: "",
 			editTitle: "",
 			crossList: [],
-			signsList: [],
+
 			warnImgList: [],
 			weatherObj: {
 				today: {},
@@ -463,11 +524,24 @@ export default {
 			},
 			warnValueObj: {},
 			valueName: "",
-			signListQuery: {
+			signsRedList: [],
+			signRedListQuery: {
 				pageNo: 1,
 				pageSize: 10,
 			},
-			signTotal: 0,
+			signRedTotal: 0,
+			signsYellowList: [],
+			signYellowListQuery: {
+				pageNo: 1,
+				pageSize: 10,
+			},
+			signYellowTotal: 0,
+			signsWhiteList: [],
+			signWhiteListQuery: {
+				pageNo: 1,
+				pageSize: 10,
+			},
+			signWhiteTotal: 0,
 			socket: "",
 			enDataObjList: [],
 			enDataObj: {
@@ -493,11 +567,24 @@ export default {
 				projectName: this.$route.query.projectName ? this.$route.query.projectName : '杭州至富阳城际铁路附属配套工程10kV电力管线永久回迁工程三号隧道范围PD'
 			},
 			deviceNumber: '',
-			monListQuery: {
+			envRedList: [],
+			envRedListQuery: {
 				pageNo: 1,
 				pageSize: 10,
 			},
-			monTotal: 0,
+			envRedTotal: 0,
+			envYellowList: [],
+			envYellowListQuery: {
+				pageNo: 1,
+				pageSize: 10,
+			},
+			envYellowTotal: 0,
+			envWhiteList: [],
+			envWhiteListQuery: {
+				pageNo: 1,
+				pageSize: 10,
+			},
+			envWhiteTotal: 0,
 			crossListQuery: {
 				pageNo: 1,
 				pageSize: 10,
@@ -507,26 +594,32 @@ export default {
 	},
 	created() {
 		this.getWeatherData();
-		this.getProjectEnvironData();
-		// this.warnImgList = warnImgList;
-		this.getApexrestData();
-		this.getvalueData()
 		this.selectStUploadFileListData()
+		this.getProjectEnvironData();
+		this.getvalueData()
+
 	},
 	methods: {
-		async getApexrestData(isLazy) {
-			const { result } = await getApexrest(this.signListQuery);
-			result.list.map((item) => {
-				signsDict.filter((i) => {
-					if (item.type === Object.keys(i)[0]) {
-						item.type = Object.values(i)[0];
-					}
-				});
-			});
-			this.signsList = isLazy
-				? [...this.signsList, ...result.list]
+		async getBraceletAlarmOrdinaryData(isLazy) {
+			const { result } = await getBraceletAlarmOrdinary({ ...this.signWhiteListQuery, ...{ 'projectNumber': this.projectId } });
+			this.signsWhiteList = isLazy
+				? [...this.signsWhiteList, ...result.list]
 				: result.list;
-			this.signTotal = result.total;
+			this.signWhiteTotal = result.total;
+		},
+		async getBraceletAlarmCommonlyData(isLazy) {
+			const { result } = await getBraceletAlarmCommonly({ ...this.signYellowListQuery, ...{ 'projectNumber': this.projectId } });
+			this.signsYellowList = isLazy
+				? [...this.signsYellowList, ...result.list]
+				: result.list;
+			this.signYellowTotal = result.total;
+		},
+		async getBraceletAlarmSeriousData(isLazy) {
+			const { result } = await getBraceletAlarmSerious({ ...this.signRedListQuery, ...{ 'projectNumber': this.projectId } });
+			this.signsRedList = isLazy
+				? [...this.signsRedList, ...result.list]
+				: result.list;
+			this.signRedTotal = result.total;
 		},
 		async getvalueData() {
 			const { result } = await getvalue({ id: "1" });
@@ -581,13 +674,15 @@ export default {
 			}).then(res => {
 				_this.enDataObjList = res.result
 				_this.socket.onmessage = function (msg) {
-					_this.enDataObj = JSON.parse(msg.data);
-					_this.enDataObjList = _this.enDataObjList.map(item => {
-						if (item.equipmentNumber === _this.enDataObj.equipmentNumber) {
-							item = _this.enDataObj
-						}
-						return item
-					})
+					if (msg.data !== '连接成功' && JSON.parse(msg.data).messageType === '2') {
+						_this.enDataObj = JSON.parse(msg.data);
+						_this.enDataObjList = _this.enDataObjList.map(item => {
+							if (item.equipmentNumber === _this.enDataObj.equipmentNumber) {
+								item = _this.enDataObj
+							}
+							return item
+						})
+					}
 				};
 			})
 
@@ -607,19 +702,42 @@ export default {
 					}
 					if (!isLazy) {
 						this.connectionSocket();
-						this.getMonitorPageData()
+						this.getEnAlarmOrdinaryData()
+						this.getEnAlarmCommonlyData()
+						this.getEnAlarmSeriousData()
 						this.getCrossPageData()
+						this.getBraceletAlarmCommonlyData();
+						this.getBraceletAlarmOrdinaryData()
+						this.getBraceletAlarmSeriousData()
 					}
 				})
 			});
 		},
-		async getMonitorPageData(isLazy) {
-			const { result } = await getMonitorPage({ ...this.monListQuery, ...{ 'projectNumber': this.projectId } })
-			this.monList = isLazy
-				? [...this.monList, ...result.list]
+
+		async getEnAlarmOrdinaryData(isLazy) {
+			const { result } = await getEnAlarmOrdinary({ ...this.envWhiteListQuery, ...{ 'projectNumber': this.projectId } })
+			this.envWhiteList = isLazy
+				? [...this.envWhiteList, ...result.list]
 				: result.list;
-			this.monTotal = result.total
+			this.envWhiteTotal = result.total
 		},
+
+		async getEnAlarmCommonlyData(isLazy) {
+			const { result } = await getEnAlarmCommonly({ ...this.envYellowListQuery, ...{ 'projectNumber': this.projectId } })
+			this.envYellowList = isLazy
+				? [...this.envYellowList, ...result.list]
+				: result.list;
+			this.envYellowTotal = result.total
+		},
+
+		async getEnAlarmSeriousData(isLazy) {
+			const { result } = await getEnAlarmSerious({ ...this.envRedListQuery, ...{ 'projectNumber': this.projectId } })
+			this.envRedList = isLazy
+				? [...this.envRedList, ...result.list]
+				: result.list;
+			this.envRedTotal = result.total
+		},
+
 		async getCrossPageData(isLazy) {
 			const { result } = await getCrossPage({ ...this.crossListQuery, ...{ 'projectNumber': this.projectId } })
 			this.crossList = isLazy
@@ -658,23 +776,60 @@ export default {
 		this.socket.close()
 	},
 	mounted() {
-		let monListDom = document.querySelector(".monListBox");
-		let monIsScroll = true;
-		monListDom.addEventListener("scroll", (v) => {
-			const monScrollDistance =
-				monListDom.scrollHeight - monListDom.scrollTop < monListDom.clientHeight;
-			if (!monScrollDistance && this.monTotal > 10 && monIsScroll) {
-				if (this.monListQuery.pageNo >= Math.ceil(this.monTotal / 10)) {
+		let envWhiteListDom = document.querySelector(".envWhiteListBox");
+		let envWhiteIsScroll = true;
+		envWhiteListDom.addEventListener("scroll", (v) => {
+			const envWhiteScrollDistance =
+				envWhiteListDom.scrollHeight - envWhiteListDom.scrollTop < envWhiteListDom.clientHeight;
+			if (!envWhiteScrollDistance && this.envWhiteTotal > 10 && envWhiteIsScroll) {
+				if (this.envWhiteListQuery.pageNo >= Math.ceil(this.envWhiteTotal / 10)) {
 					this.$message.warning("没有更多数据了");
-					monIsScroll = false;
+					envWhiteIsScroll = false;
 				}
-				if (this.monListQuery.pageNo < Math.ceil(this.monTotal / 10)) {
-					this.monListQuery.pageNo++;
-					this.getMonitorPageData(true);
-					monIsScroll = true;
+				if (this.envWhiteListQuery.pageNo < Math.ceil(this.envWhiteTotal / 10)) {
+					this.envWhiteListQuery.pageNo++;
+					this.getEnAlarmOrdinaryData(true);
+					envWhiteIsScroll = true;
 				}
 			}
 		});
+
+		let envYellowListDom = document.querySelector(".envYellowListBox");
+		let envYellowIsScroll = true;
+		envYellowListDom.addEventListener("scroll", (v) => {
+			const envYellowScrollDistance =
+				envYellowListDom.scrollHeight - envYellowListDom.scrollTop < envYellowListDom.clientHeight;
+			if (!envYellowScrollDistance && this.envYellowTotal > 10 && envYellowIsScroll) {
+				if (this.envYellowListQuery.pageNo >= Math.ceil(this.envYellowTotal / 10)) {
+					this.$message.warning("没有更多数据了");
+					envYellowIsScroll = false;
+				}
+				if (this.envYellowListQuery.pageNo < Math.ceil(this.envYellowTotal / 10)) {
+					this.envYellowListQuery.pageNo++;
+					this.getEnAlarmCommonlyData(true);
+					envYellowIsScroll = true;
+				}
+			}
+		});
+
+		let envRedListDom = document.querySelector(".envRedListBox");
+		let envRedIsScroll = true;
+		envRedListDom.addEventListener("scroll", (v) => {
+			const envRedScrollDistance =
+				envRedListDom.scrollHeight - envRedListDom.scrollTop < envRedListDom.clientHeight;
+			if (!envRedScrollDistance && this.envRedTotal > 10 && envRedIsScroll) {
+				if (this.envRedListQuery.pageNo >= Math.ceil(this.envRedTotal / 10)) {
+					this.$message.warning("没有更多数据了");
+					envRedIsScroll = false;
+				}
+				if (this.envRedListQuery.pageNo < Math.ceil(this.envRedTotal / 10)) {
+					this.envRedListQuery.pageNo++;
+					this.getEnAlarmSeriousData(true);
+					envRedIsScroll = true;
+				}
+			}
+		});
+
 
 		let crossListDom = document.querySelector(".crossListBox");
 		let crossIsScroll = true;
@@ -694,23 +849,61 @@ export default {
 			}
 		});
 
-		let signListDom = document.querySelector(".signListBox");
-		let signIsScroll = true;
-		signListDom.addEventListener("scroll", (v) => {
-			const monScrollDistance =
-				signListDom.scrollHeight - signListDom.scrollTop < signListDom.clientHeight;
-			if (!monScrollDistance && this.signTotal > 10 && signIsScroll) {
-				if (this.signListQuery.pageNo >= Math.ceil(this.signTotal / 10)) {
+		let signWhiteListDom = document.querySelector(".signWhiteListBox");
+		let signWhiteIsScroll = true;
+		signWhiteListDom.addEventListener("scroll", (v) => {
+			const signWhiteScrollDistance =
+				signWhiteListDom.scrollHeight - signWhiteListDom.scrollTop < signWhiteListDom.clientHeight;
+			if (!signWhiteScrollDistance && this.signWhiteTotal > 10 && signWhiteIsScroll) {
+				if (this.signWhiteListQuery.pageNo >= Math.ceil(this.signWhiteTotal / 10)) {
 					this.$message.warning("没有更多数据了");
-					signIsScroll = false;
+					signWhiteIsScroll = false;
 				}
-				if (this.signListQuery.pageNo < Math.ceil(this.signTotal / 10)) {
-					this.signListQuery.pageNo++;
-					this.getApexrestData(true);
-					signIsScroll = true;
+				if (this.signWhiteListQuery.pageNo < Math.ceil(this.signWhiteTotal / 10)) {
+					this.signWhiteListQuery.pageNo++;
+					this.getBraceletAlarmOrdinaryData(true);
+					signWhiteIsScroll = true;
 				}
 			}
 		});
+
+		let signYellowListDom = document.querySelector(".signYellowListBox");
+		let signYellowIsScroll = true;
+		signYellowListDom.addEventListener("scroll", (v) => {
+			const signYellowScrollDistance =
+				signYellowListDom.scrollHeight - signYellowListDom.scrollTop < signYellowListDom.clientHeight;
+			if (!signYellowScrollDistance && this.signYellowTotal > 10 && signYellowIsScroll) {
+				if (this.signYellowListQuery.pageNo >= Math.ceil(this.signYellowTotal / 10)) {
+					this.$message.warning("没有更多数据了");
+					signYellowIsScroll = false;
+				}
+				if (this.signYellowListQuery.pageNo < Math.ceil(this.signYellowTotal / 10)) {
+					this.signYellowListQuery.pageNo++;
+					this.getBraceletAlarmCommonlyData(true);
+					signYellowIsScroll = true;
+				}
+			}
+		});
+
+		let signRedListDom = document.querySelector(".signRedListBox");
+		let signRedIsScroll = true;
+		signRedListDom.addEventListener("scroll", (v) => {
+			const signRedScrollDistance =
+				signRedListDom.scrollHeight - signRedListDom.scrollTop < signRedListDom.clientHeight;
+			if (!signRedScrollDistance && this.signRedTotal > 10 && signRedIsScroll) {
+				if (this.signRedListQuery.pageNo >= Math.ceil(this.signRedTotal / 10)) {
+					this.$message.warning("没有更多数据了");
+					signRedIsScroll = false;
+				}
+				if (this.signRedListQuery.pageNo < Math.ceil(this.signRedTotal / 10)) {
+					this.signRedListQuery.pageNo++;
+					this.getBraceletAlarmSeriousData(true);
+					signRedIsScroll = true;
+				}
+			}
+		});
+
+
 	},
 };
 </script>
@@ -728,7 +921,7 @@ export default {
 				margin-bottom: 10px;
 			}
 			.el-carousel {
-				height: calc(80% - 110px);
+				height: calc(72% - 110px);
 				width: 100%;
 				position: relative;
 				margin-bottom: 10px;
@@ -902,6 +1095,8 @@ export default {
 			}
 			.bottomBox {
 				height: calc(20% + 110px);
+				overflow: auto;
+				@include scrollbar;
 				background-color: rgba($color: #5d7dff, $alpha: 0.13);
 				padding-bottom: 30px;
 				.titleBox {
@@ -915,226 +1110,207 @@ export default {
 					}
 					.numberClass {
 						@include flex;
-						.red {
+						font-size: 1.2rem;
+						span {
 							margin-right: 5px;
-							color: #ff4326;
-							font-size: 2rem;
 							font-weight: bolder;
+						}
+						.red {
+							color: #ff4326;
+						}
+						.yellow {
+							color: #ffb219;
+						}
+						.white {
+							color: #ffffff;
 						}
 					}
 				}
 				.listBox {
-					height: calc(100% - 100px);
-					padding: 0px 10px;
+					height: 45%;
+					margin: 5px 10px;
 					overflow: auto;
 					@include scrollbar;
+					padding-left: 10%;
+					img {
+						margin-right: 5px;
+					}
+
+					&.envWhiteListBox {
+						color: #ffffff;
+						border-bottom: 1px solid #ffffff;
+						img {
+							width: 15px !important;
+							height: 14px !important;
+						}
+					}
+					&.envRedListBox {
+						color: #ff4326;
+						border-bottom: 1px solid #ff4326;
+						li{
+							margin-left: 2px;
+						}
+					}
+					&.envYellowListBox {
+						color: #ffb219;
+						border-bottom: 1px solid #ff4326;
+					}
 					ul {
 						height: 100%;
 						li {
 							height: 28px;
 							line-height: 28px;
-							font-size: 1.4rem;
-							color: #ff6851;
+							font-size: 1.1rem;
+							// color: #ff6851;
 							overflow: hidden;
 							text-overflow: ellipsis;
 							text-align: left;
+							display: flex;
+							justify-content: flex-start;
+							margin-left: 10px;
 						}
 					}
 				}
 			}
 		}
-		.right-box {
-			width: calc(70% + 10px);
+		.main-box {
+			width: calc(45% + 10px);
 			height: 100%;
 			.top-box {
 				height: 63%;
 				width: 100%;
-				@include flex;
-				.top-left-box {
-					width: 70%;
-					height: 100%;
-					.place-box {
-						height: 40px;
-						line-height: 40px;
-						margin-bottom: 10px;
-						@include flex-row-left;
-						span {
-							margin-left: 10px;
-							font-size: 1.6rem;
-						}
+				.place-box {
+					height: 40px;
+					line-height: 40px;
+					margin-bottom: 10px;
+					@include flex-row-left;
+					span {
+						margin-left: 10px;
+						font-size: 1.6rem;
 					}
-					.weather-box {
+				}
+				.weather-box {
+					width: 100%;
+					background: rgba($color: #5d7dff, $alpha: 0.13);
+					height: 49%;
+					padding: 0px 10px 10px 10px;
+					display: flex;
+					flex-flow: column;
+					justify-content: space-around;
+					.titleClass {
 						width: 100%;
-						background: rgba($color: #5d7dff, $alpha: 0.13);
-						height: 49%;
-						padding: 0px 10px 10px 10px;
-						.titleClass {
-							width: 100%;
-							height: 30px;
-							line-height: 30px;
-							font-size: 1.6rem;
-							color: #5aa1ff;
-							text-align: left;
-						}
-						.todayWeather {
-							width: 100%;
-							@include flex-row-bet;
-							.weatherWord {
-								font-size: 4.4rem;
-								color: #00ffb1;
-							}
-							.weatcherWarn {
-								display: inline-block;
-								background: #5d83c6;
-								border-radius: 4px;
-								width: 200px;
-								height: 60px;
-								@include flex-col;
-								span {
-									display: inline-block;
-									width: 100%;
-									text-align: center;
-									height: 30px;
-									line-height: 30px;
-									font-size: 1.6rem;
-									&:last-child {
-										color: #ff2e0e;
-									}
-								}
-							}
-						}
-						.weatherWordSmall {
-							width: 100%;
-							text-align: left;
-							font-size: 1.6rem;
+						height: 30px;
+						line-height: 30px;
+						font-size: 1.6rem;
+						color: #5aa1ff;
+						text-align: left;
+					}
+					.todayWeather {
+						width: 100%;
+						@include flex-row-bet;
+						.weatherWord {
+							font-size: 4.4rem;
 							color: #00ffb1;
 						}
-						h3 {
-							font-size: 2rem;
-							text-align: left;
-							width: 100%;
-						}
-						.weatherList {
-							width: 100%;
-							overflow: hidden;
-							ul {
-								overflow-x: auto;
-								overflow-y: hidden;
-								@include flex-row-left;
-								height: 60px;
-								li {
-									height: 100%;
-									@include flex-col-top;
-									margin-left: 17px;
-									img {
-										width: 40px;
-										height: 40px;
-									}
-									span {
-										font-size: 1.2rem;
-									}
+						.weatcherWarn {
+							display: inline-block;
+							background: #5d83c6;
+							border-radius: 4px;
+							width: 200px;
+							height: 60px;
+							@include flex-col;
+							span {
+								display: inline-block;
+								width: 100%;
+								text-align: center;
+								height: 30px;
+								line-height: 30px;
+								font-size: 1.6rem;
+								&:last-child {
+									color: #ff2e0e;
 								}
 							}
 						}
 					}
-					.setting-box {
-						margin-top: 10px;
+					.weatherWordSmall {
 						width: 100%;
-						height: 36.8%;
-						background: rgba($color: #5d7dff, $alpha: 0.13);
-						padding: 0px 10px 10px 10px;
-						h3 {
-							color: #5aa1ff;
-							font-size: 1.6rem;
-							width: 100%;
-							text-align: left;
-							height: 30px;
-							line-height: 30px;
-						}
-						.listBox {
-							width: 100%;
-							display: flex;
-							justify-content: flex-start;
-							flex-flow: wrap;
-							@include scrollbar;
-							p {
-								width: 25%;
-								height: 30px;
-								line-height: 30px;
-								font-size: 1.4rem;
-								text-align: left;
-								@include flex;
+						text-align: left;
+						font-size: 1.6rem;
+						color: #00ffb1;
+					}
+					h3 {
+						font-size: 2rem;
+						text-align: left;
+						width: 100%;
+					}
+					.weatherList {
+						width: 100%;
+						overflow: hidden;
+						ul {
+							overflow-x: auto;
+							overflow-y: hidden;
+							@include flex-row-left;
+							height: 60px;
+							li {
+								height: 100%;
+								@include flex-col-top;
+								margin-left: 17px;
+								img {
+									width: 40px;
+									height: 40px;
+								}
 								span {
-									&:first-child {
-										width: 70px;
-										text-align: right;
-									}
-									&:nth-child(2) {
-										margin-left: 5px;
-										min-width: 60px;
-										color: #ff6851;
-									}
-									&:last-child {
-										color: #ff7c19;
-										cursor: pointer;
-									}
+									font-size: 1.2rem;
 								}
 							}
 						}
 					}
 				}
-				.top-right-box {
-					width: calc(30% - 10px);
-					margin-left: 10px;
-					margin-top: 50px;
-					height: calc(100% - 50px);
+				.setting-box {
+					margin-top: 10px;
+					width: 100%;
+					height: 36.8%;
 					background: rgba($color: #5d7dff, $alpha: 0.13);
-					.itemClass {
-						width: 100%;
-						height: 50%;
+					padding: 0px 10px 10px 10px;
+					display: flex;
+					flex-flow: column;
+					justify-content: space-around;
+					h3 {
+						color: #5aa1ff;
 						font-size: 1.6rem;
+						width: 100%;
 						text-align: left;
-						.titleBox {
+						height: 30px;
+						line-height: 30px;
+					}
+					.listBox {
+						width: 100%;
+						display: flex;
+						justify-content: flex-start;
+						flex-flow: wrap;
+						@include scrollbar;
+						p {
+							width: 25%;
 							height: 30px;
 							line-height: 30px;
-							padding: 0px 20px;
-							@include flex-bet;
-							.titleClass {
-								color: #5aa1ff;
-							}
-							.numberClass {
-								.red {
-									color: #ff4326;
-									font-size: 1.8rem;
-									font-weight: bolder;
+							font-size: 1.4rem;
+							text-align: left;
+							@include flex;
+							span {
+								&:first-child {
+									width: 70px;
+									text-align: right;
 								}
-							}
-						}
-						.listBox {
-							height: calc(100% - 30px);
-							overflow: auto;
-							@include scrollbar;
-							ul {
-								height: 100%;
-								li {
-									margin-top: 5px;
-									height: 28px;
-									line-height: 28px;
-									font-size: 1.1rem;
-									padding: 0px 5px 0px 20px;
+								&:nth-child(2) {
+									margin-left: 5px;
+									min-width: 60px;
 									color: #ff6851;
-									background-color: rgba($color: #ff0000, $alpha: 0.05);
-									overflow: hidden;
-									text-overflow: ellipsis;
+								}
+								&:last-child {
+									color: #ff7c19;
+									cursor: pointer;
 								}
 							}
-						}
-						&:last-child {
-							height: calc(50% - 20px);
-							margin-top: 10px;
-						}
-						&:first-child {
-							margin-bottom: 10px;
 						}
 					}
 				}
@@ -1189,6 +1365,89 @@ export default {
 							}
 						}
 					}
+				}
+			}
+		}
+		.right-box {
+			width: calc(30% - 10px);
+			margin-left: 10px;
+			margin-top: 50px;
+			height: calc(100% - 50px);
+			background: rgba($color: #5d7dff, $alpha: 0.13);
+			.itemClass {
+				width: 100%;
+				height: 33%;
+				font-size: 1.6rem;
+				text-align: left;
+				overflow: auto;
+				@include scrollbar;
+				&:last-child {
+					background: rgba($color: #7b95ff, $alpha: 0.2);
+				}
+				.titleBox {
+					height: 30px;
+					line-height: 30px;
+					padding: 0px 20px;
+					@include flex-bet;
+					.titleClass {
+						color: #5aa1ff;
+						font-size: 1.4rem;
+					}
+					.numberClass {
+						font-size: 1.2rem;
+						.red {
+							color: #ff4326;
+							font-size: 1.2rem;
+							font-weight: bolder;
+						}
+					}
+				}
+				.listBox {
+					height: 33%;
+					overflow: auto;
+					@include scrollbar;
+					margin: 5px 10px;
+					img {
+						margin-right: 10px;
+					}
+					&.crossListBox {
+						height: 80%;
+					}
+					&.signRedListBox {
+						color: #ff4b30;
+						border-bottom: 1px solid #ff4b30;
+					}
+					&.signYellowListBox {
+						color: #ffb219;
+						border-bottom: 1px solid #ffb219;
+					}
+					&.signWhiteListBox {
+						color: #ffffff;
+						border-bottom: 1px solid #ffffff;
+					}
+					ul {
+						// height: 100%;
+						li {
+							margin-top: 5px;
+							height: 28px;
+							line-height: 28px;
+							font-size: 1.1rem;
+							padding: 0px 5px 0px 20px;
+							// color: #ff6851;
+							// background-color: rgba($color: #ff0000, $alpha: 0.05);
+							overflow: hidden;
+							text-overflow: ellipsis;
+							display: flex;
+							align-items: center;
+						}
+					}
+				}
+				&:last-child {
+					height: calc(69% - 20px);
+					margin-top: 10px;
+				}
+				&:first-child {
+					margin-bottom: 10px;
 				}
 			}
 		}

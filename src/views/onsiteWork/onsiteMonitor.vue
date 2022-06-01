@@ -43,8 +43,24 @@
 			</div>
 		</div>
 		<div class="right-box">
+			<el-select
+				v-model="boxNumber"
+				class="boxInput"
+				style="float: left; margin-bottom: 5px"
+			>
+				<el-option
+					v-for="item in boxNumberList"
+					:key="item"
+					:value="item"
+					:label="item + ' 格'"
+				></el-option>
+			</el-select>
 			<div class="imgList">
-				<div class="itemImg">
+				<div
+					:class="'itemImg boxClass' + boxNumber"
+					v-for="i in boxNumber"
+					:key="i"
+				>
 					<!-- <div id="video-container" style="width: 600px; height: 600px"></div> -->
 
 					<!-- <video
@@ -125,7 +141,9 @@ export default {
 			player: null,
 			myPlayer: '',
 			dialogFormVisible: false,
-			playerBig: null
+			playerBig: null,
+			boxNumberList: [4, 9, 16],
+			boxNumber: 9
 		};
 	},
 	created() {
@@ -282,21 +300,36 @@ export default {
 			background: rgba($color: #5d7dff, $alpha: 0.13);
 			.imgList {
 				width: 100%;
-				height: 100%;
+				height: calc(100% - 65px);
 				overflow-y: auto;
 				display: flex;
 				flex-flow: wrap;
 				justify-content: flex-start;
 				align-content: baseline;
 				@include scrollbar;
-				background: url(~@/assets/images/onsite/videoBg.png) no-repeat;
-				background-size: 100% 100%;
+				// background: url(~@/assets/images/onsite/videoBg.png) no-repeat;
+				// background-size: 100% 100%;
 				.itemImg {
-					width: 33%;
-					height: 33%;
 					padding: 10px;
 					position: relative;
 					cursor: pointer;
+					background: #000;
+
+					&.boxClass9 {
+						width: 33%;
+						height: 33%;
+						margin: 0px 0.3% 0.2% 0px;
+					}
+					&.boxClass4 {
+						width: 49%;
+						height: 49%;
+						margin: 0px 0.3% 0.2% 0px;
+					}
+					&.boxClass16 {
+						width: 24.5%;
+						height: 24.5%;
+						margin: 0px 0.5% 0.3% 0px;
+					}
 					img,
 					video {
 						width: 100%;
@@ -344,6 +377,15 @@ export default {
 	}
 	.searchInput .el-input__icon {
 		line-height: 34px;
+	}
+	.boxInput .el-input__inner {
+		height: 20px;
+		background: transparent !important;
+		color: #fff;
+		width: 100px;
+	}
+	.boxInput .el-input__icon {
+		line-height: 20px;
 	}
 	.el-tree-node:focus > .el-tree-node__content {
 		background: transparent;

@@ -1,4 +1,5 @@
 import { constantRoutes } from '@/router'
+import { getUserRouters } from '@/api/public'
 
 const state = {
   routes: [],
@@ -21,6 +22,29 @@ const actions = {
       }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
+    })
+  },
+  getPermRoutes({ commit }, obj) {
+    return new Promise((resolve, reject) => {
+      getUserRouters(obj).then(({ result }) => {
+        let permRoutes = result.routes.filter(item => {
+          if (item.meta) {
+            return item
+          }
+        })
+        let accessedRoutes = []
+        for (let i of constantRoutes[2].children) {
+          for (let j of permRoutes) {
+            if (i.path === j.path) {
+              accessedRoutes.push(i)
+            }
+          }
+        }
+        commit('SET_ROUTES', accessedRoutes)
+        resolve(result)
+      }).catch(error => {
+        reject(error)
+      })
     })
   }
 }
