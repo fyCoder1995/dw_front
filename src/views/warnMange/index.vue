@@ -638,7 +638,7 @@ export default {
 		getWeatherData() {
 			axios
 				.get(
-					"https://restapi.amap.com/v3/weather/weatherInfo?key=86c518d3cb3b997dfc9ec3214e9c9a9a&city=330100&extensions=all&output=JSON"
+					"https://restapi.amap.com/v3/weather/weatherInfo?key=70ecd83d2d48557968cbbbf9cd1552a6&city=330100&extensions=all&output=JSON"
 				)
 				.then(({ data }) => {
 					this.weatherObj.province = data.forecasts[0].province;
