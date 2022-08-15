@@ -29,7 +29,7 @@ module.exports = {
     }
   },
   configureWebpack: {
-    name: '配电不停电作业现场安全管控辅助平台',
+    name: '新型配电作业远程安全管控辅助平台',
     resolve: {
       alias: {
         '@': resolve('src')

@@ -1,7 +1,7 @@
 <template>
 	<!-- name: '登录' -->
 	<div class="login_container">
-		<h3>配电不停电工作现场安全管控辅助平台</h3>
+		<h3>新型配电作业远程安全管控辅助平台</h3>
 
 		<el-form
 			:model="loginForm"

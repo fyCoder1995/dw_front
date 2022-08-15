@@ -7,40 +7,43 @@ export const treeList = [{
     childrenList: [{
       name: '单兵1',
       id: '1-1'
+    }, {
+      name: '单兵2',
+      id: '1-2'
     }],
-  }, 
-  // {
-  //   name: '配电工程分公司',
-  //   id: '1-2',
-  //   childrenList: [{
-  //     name: '单兵1',
-  //     id: '1-2-1'
-  //   }, {
-  //     name: '单兵2',
-  //     id: '1-2-2'
-  //   }, {
-  //     name: '单兵3',
-  //     id: '1-2-3'
-  //   }, {
-  //     name: '单兵4',
-  //     id: '1-2-4'
-  //   }, {
-  //     name: '单兵5',
-  //     id: '1-2-5'
-  //   }, {
-  //     name: '单兵6',
-  //     id: '1-2-6'
-  //   }, {
-  //     name: '单兵7',
-  //     id: '1-2-7'
-  //   }, {
-  //     name: '单兵8',
-  //     id: '1-2-8'
-  //   }, {
-  //     name: '单兵9',
-  //     id: '1-2-9'
-  //   }],
-  // }
+  },
+    // {
+    //   name: '配电工程分公司',
+    //   id: '1-2',
+    //   childrenList: [{
+    //     name: '单兵1',
+    //     id: '1-2-1'
+    //   }, {
+    //     name: '单兵2',
+    //     id: '1-2-2'
+    //   }, {
+    //     name: '单兵3',
+    //     id: '1-2-3'
+    //   }, {
+    //     name: '单兵4',
+    //     id: '1-2-4'
+    //   }, {
+    //     name: '单兵5',
+    //     id: '1-2-5'
+    //   }, {
+    //     name: '单兵6',
+    //     id: '1-2-6'
+    //   }, {
+    //     name: '单兵7',
+    //     id: '1-2-7'
+    //   }, {
+    //     name: '单兵8',
+    //     id: '1-2-8'
+    //   }, {
+    //     name: '单兵9',
+    //     id: '1-2-9'
+    //   }],
+    // }
   ]
 }]
 
@@ -75,7 +78,7 @@ export const cameraList = [
 // 无人机列表
 export const droneList = [
   {
-    id: '1', name: '无人机', videoURL: 'mVlcPlayer://keyhand@show:rtmp://39.170.62.182:1935/live/livestream_1020230000000012',
+    id: '1', name: '无人机1', videoURL: 'mVlcPlayer://keyhand@show:rtmp://39.170.62.182:1935/live/livestream_1020230000000012',
     detail: {
       num: '001',
       curPro: '杭州绕城高速西湖服务区新设杆上施工变工程',
@@ -85,6 +88,17 @@ export const droneList = [
       person: '周亮'
     }
   },
+  {
+    id: '2', name: '无人机2', videoURL: 'mVlcPlayer://keyhand@show:rtmp://39.170.62.182:1935/live/livestream_1020230000000013',
+    detail: {
+      num: '002',
+      curPro: '杭州绕城高速西湖服务区新设杆上施工变工程',
+      plan: '观潮路工程10KV电力架空线迁改（御道分线14#-16#工程新装十字横担2付，新放架空线至御道分线10#杆、19#杆',
+      type: '配电',
+      group: '试验队',
+      person: '周亮'
+    }
+  }
   // {
   //   id: '2', name: '无人机2', videoURL: 'http://47.93.240.247:8080/ftp/video/droneVideo2.mp4',
   //   detail: {

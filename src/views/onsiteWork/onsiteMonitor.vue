@@ -58,7 +58,8 @@
 			<div class="imgList">
 				<div
 					:class="'itemImg boxClass' + boxNumber"
-					v-for="i in boxNumber"
+					:id="'video' + index"
+					v-for="(i, index) in boxNumber"
 					:key="i"
 				>
 					<!-- <div id="video-container" style="width: 600px; height: 600px"></div> -->
@@ -76,7 +77,7 @@
 					<i class="el-icon-circle-close" @click="handleClose(item)"></i> -->
 					<i
 						class="el-icon-circle-close"
-						@click="handleClose()"
+						@click="handleClose(index)"
 						v-show="videoList.length > 0"
 						style="z-index: 99"
 					></i>
@@ -147,7 +148,7 @@ export default {
 		};
 	},
 	created() {
-		this.onsiteList = onsiteList;
+		// this.onsiteList = onsiteList;
 		this.getProjectNameListData()
 		this.treeList = treeList
 		this.getToken()
@@ -209,13 +210,34 @@ export default {
 			// } else {
 			// 	this.$message.error('最多添加9个摄像头！')
 			// }
-			if (this.videoList.length === 1) {
-				this.$message.error('请勿重复添加！')
+
+			// if (this.videoList.length > 0) {
+			// 	this.videoList.find(item => {
+			// 		console.warn(item);
+			// 	})
+			// 	// this.$message.error('请勿重复添加！')
+			// } else {
+			// 	this.getLiveAddress()
+			// }
+
+			let temp = { id: node.data.id }
+
+			if (this.onsiteList.length > 0) {
+				this.onsiteList.find(item => {
+					if (item.id === node.data.id) {
+						this.$message.error('请勿重复添加！')
+					} else {
+						this.getLiveAddress(node.data.id)
+						this.onsiteList.push(temp)
+					}
+				})
 			} else {
-				this.getLiveAddress()
+				this.getLiveAddress(node.data.id)
+				this.onsiteList.push(temp)
 			}
 		},
-		handleClose() {
+		handleClose(index) {
+			this.onsiteList.splice(index,1)
 			this.videoList = []
 			this.player.stop()
 			document.querySelector('.itemImg').removeChild(this.myPlayer)
@@ -227,31 +249,44 @@ export default {
 			}
 		},
 		getToken() {
-			axios.post('https://open.ys7.com/api/lapp/token/get?appKey=328111ffc644438e99b9a8a5f179207d&appSecret=990298213b44f0670c1eea96d1d95573')
+			axios.post('https://open.ys7.com/api/lapp/token/get?appKey=5fdcfe12877743c381ac9018f4c70590&appSecret=1bda20f199e908284fc8eaf826817e30')
 				.then(({ data }) => {
 					this.accessToken = data.data.accessToken
 				})
 		},
-		getLiveAddress() {
-			axios.post('https://open.ys7.com/api/lapp/v2/live/address/get?accessToken=' + this.accessToken + "&deviceSerial=D41227818&code=BFNPPS")
-				.then(({ data }) => {
-					let temp = { id: 'D41227818', url: data.data.url }
-					this.videoList.push(temp)
-					let myPlayer = document.createElement('div')
-					document.querySelector('.itemImg').appendChild(myPlayer)
-					myPlayer.id = 'myPlayer'
-					myPlayer.style.width = '100%'
-					myPlayer.style.height = '100%'
-					myPlayer.style.overflow = 'hidden'
-					myPlayer.allowfullscreen = 'allowfullscreen'
-					this.myPlayer = myPlayer
-					this.player = new EZUIKit.EZUIKitPlayer({
-						autoplay: true,
-						id: "myPlayer",
-						accessToken: this.accessToken,
-						url: this.videoList[0].url,
-						fullScreenCallBack: data => console.log("全屏回调", data),
-					});
+		getLiveAddress(id) {
+			let deviceSerial = 'K35503198'
+			let code = 'JYRNJY'
+			let domId = '#video0'
+			if (id === '1-2') {
+				deviceSerial = 'K35503359'
+				code = 'IPOIQG'
+				domId = '#video1'
+			}
+			axios.post('https://open.ys7.com/api/lapp/v2/live/address/get?accessToken=' + this.accessToken + "&deviceSerial=" + deviceSerial + "&code=" + code)
+				.then(({  data }) => {
+					if (data.code === '200') {
+						let temp = { id: 'D41227818', url: data.data.url }
+						this.videoList.push(temp)
+						let myPlayer = document.createElement('div')
+						document.querySelector(domId).appendChild(myPlayer)
+						myPlayer.id = 'myPlayer'
+						myPlayer.style.width = '100%'
+						myPlayer.style.height = '100%'
+						myPlayer.style.overflow = 'hidden'
+						myPlayer.allowfullscreen = 'allowfullscreen'
+						this.myPlayer = myPlayer
+						this.player = new EZUIKit.EZUIKitPlayer({
+							autoplay: true,
+							id: "myPlayer",
+							accessToken: this.accessToken,
+							url: this.videoList[0].url,
+							fullScreenCallBack: data => console.log("全屏回调", data),
+						});
+					} else {
+						this.$message.error(data.msg)
+					}
+
 				})
 		},
 		handleBig() {

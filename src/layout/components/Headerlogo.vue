@@ -4,7 +4,7 @@
 			<img src="@/assets/images/logo.png" alt="logo" />
 			<span>浙江大有</span>
 		</div>
-		<h3>配电不停电工作现场安全管控辅助平台</h3>
+		<h3>新型配电作业远程安全管控辅助平台</h3>
 	</div>
 </template>
 
